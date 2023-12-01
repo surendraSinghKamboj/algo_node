@@ -18,7 +18,7 @@ function formatNumberWithTwoDecimals(value) {
   return value.toFixed(2);
 }
 
-const socket = new WebSocket("ws://localhost:4444");
+const socket = new WebSocket("ws://localhost:4400");
 
       socket.addEventListener("open", (event) => {
         console.log("WebSocket connection opened");

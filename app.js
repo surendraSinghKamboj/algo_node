@@ -2,9 +2,9 @@
 
 const express = require("express");
 const http = require("http");
-// const WebSocket = require("ws");
+const cors = require("cors");
 const path = require("path");
-
+bodyParser = require("body-parser");
 const UpstoxClient = require("upstox-js-sdk");
 const WebSocket = require("ws").WebSocket;
 const protobuf = require("protobufjs");
@@ -16,6 +16,8 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
+app.use(cors());
+app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
@@ -26,9 +28,7 @@ let protobufRoot = null;
 let defaultClient = UpstoxClient.ApiClient.instance;
 let apiVersion = "2.0";
 let OAUTH2 = defaultClient.authentications["OAUTH2"];
-OAUTH2.accessToken =
-  "eyJ0eXAiOiJKV1QiLCJrZXlfaWQiOiJza192MS4wIiwiYWxnIjoiSFMyNTYifQ.eyJzdWIiOiI3MDU4MjAiLCJqdGkiOiI2NTY4Y2E1MjA4M2NjODU3OGUwNDM3MDEiLCJpc011bHRpQ2xpZW50IjpmYWxzZSwiaXNBY3RpdmUiOnRydWUsInNjb3BlIjpbImludGVyYWN0aXZlIiwiaGlzdG9yaWNhbCJdLCJpYXQiOjE3MDEzNjYzNTQsImlzcyI6InVkYXBpLWdhdGV3YXktc2VydmljZSIsImV4cCI6MTcwMTM4MTYwMH0.1nhX8PduyqQ4IvAosD2GeSEHZipbB1Q1U-Yh2NiDJTI"; // Replace "ACCESS_TOKEN" with your actual token
-// OAUTH2.accessToken = ""; // Replace "ACCESS_TOKEN" with your actual token
+OAUTH2.accessToken = "waiting...."; 
 
 const getMarketFeedUrl = async () => {
   return new Promise((resolve, reject) => {
@@ -116,8 +116,6 @@ const initProtobuf = async () => {
   console.log("Protobuf part initialization complete");
 };
 
-
-
 // Initialize the protobuf part and establish the WebSocket connection
 // Wrap the code in a named async function
 async function initializeMarketFeed() {
@@ -135,21 +133,18 @@ wss.on("connection", (ws) => {
   initializeMarketFeed();
 });
 
-//   // Broadcast a random number every 5 seconds
-//   const intervalId = setInterval(() => {
-//     const randomNumber = Math.floor(Math.random() * 100);
-//     wss.clients.forEach((client) => {
-//       if (client.readyState === WebSocket.OPEN) {
-//         client.send(JSON.stringify({ type: "random number", data: randomNumber }));
-//       }
-//     });
-//   }, 1000);
+app.post("/set_token", (req, res) => {
+  const newToken = req.body.token;
 
-//   ws.on("close", () => {
-//     console.log("User disconnected");
-//     clearInterval(intervalId); // Stop broadcasting when a user disconnects
-//   });
-// });
+  if (newToken) {
+    OAUTH2.accessToken = newToken;
+    return res.status(200).json({ status: true });
+  } else {
+    return res
+      .status(400)
+      .json({ status: false, message: "Token is missing in the request body" });
+  }
+});
 
 app.use("", viewRouter);
 app.use("/get", authRouter);
