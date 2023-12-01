@@ -3,9 +3,172 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <link rel="stylesheet" href="/styles/profile.css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <title>Algo | Dashboard</title>
+    <style>
+      /* Add styles for the profile_box */
+      #profile_box {
+        display: none; /* Hide by default */
+        /* Add any additional styles as needed */
+      }
+    </style>
   </head>
   <body>
-    Welcome Again
+    <div class="profile bg-purple-200 flex justify-around">
+      <% if (dashboardData.profile) { %>
+      <!-- Add a click event to toggle visibility -->
+      <h3
+        class="2xl ml-2 cursor-pointer"
+        id="name"
+        onclick="toggleProfileBox()"
+      >
+        <%= dashboardData.profile.userName %>
+      </h3>
+      <% } else { %>
+      <p>Error fetching profile data</p>
+      <% } %>
+      <div id="digital-clock"></div>
+    </div>
+    <!-- WebSocket View Start -->
+    <div class="flex justify-around h-[50px] bg-slate-600">
+      <!-- nifty 50 -->
+      <div class="flex w-96 justify-around">
+        <div class="flex flex-col">
+          <h3 class="text-white">Nifty 50</h3>
+          <h4 id="nifty_change"></h4>
+        </div>
+        <div class="text-green-600 text-3xl pt-1" id="nifty"></div>
+      </div>
+
+      <!-- nifty Bank -->
+      <div class="flex w-96 justify-around">
+        <div class="flex flex-col">
+          <h3 class="text-white">Nifty Bank</h3>
+          <h4 id="nifty_bank_change"></h4>
+        </div>
+        <div class="text-green-600 text-3xl pt-1" id="nifty_bank"></div>
+      </div>
+    </div>
+
+    <!-- WebSocket View Close -->
+    <div
+      id="profile_box"
+      class="absolute flex justify-center items-center -translate-x-1/2 -translate-y-1/2 transition-all duration-500 w-1/2 mx-auto bg-white rounded-lg shadow-[0_2.8px_2.2px_rgba(0,_0,_0,_0.034),_0_6.7px_5.3px_rgba(0,_0,_0,_0.048),_0_12.5px_10px_rgba(0,_0,_0,_0.06),_0_22.3px_17.9px_rgba(0,_0,_0,_0.072),_0_41.8px_33.4px_rgba(0,_0,_0,_0.086),_0_100px_80px_rgba(0,_0,_0,_0.12)] p-6"
+      style="display: block; top: -25%; left: -20%; width: 20%"
+    >
+      <% if (dashboardData.profile) { %>
+      <table class="table-auto w-full">
+        <tbody>
+          <tr>
+            <td class="text-lg font-semibold">Email:</td>
+            <td><%= dashboardData.profile.email %></td>
+          </tr>
+          <tr>
+            <td class="text-lg font-semibold">User ID:</td>
+            <td><%= dashboardData.profile.userId %></td>
+          </tr>
+          <tr>
+            <td class="text-lg font-semibold">User Type:</td>
+            <td><%= dashboardData.profile.userType %></td>
+          </tr>
+          <tr>
+            <td class="text-lg font-semibold">Exchanges:</td>
+            <td><%= dashboardData.profile.exchanges.join(', ') %></td>
+          </tr>
+          <tr>
+            <td class="text-lg font-semibold">Products:</td>
+            <td><%= dashboardData.profile.products.join(', ') %></td>
+          </tr>
+          <tr>
+            <td class="text-lg font-semibold">Order Types:</td>
+            <td><%= dashboardData.profile.orderTypes.join(', ') %></td>
+          </tr>
+          <!-- Add more properties as needed -->
+        </tbody>
+      </table>
+      <button
+        class="bg-red-500 border-2 mt-2 rounded-t-lg rounded-bl-lg border-orange-light opacity-75 p-2 shadow-lg font-mono text-lg"
+        onclick="toggleProfileBox()"
+      >
+        Close
+      </button>
+      <% } else { %>
+      <p class="text-red-500">Error fetching profile data</p>
+      <% } %>
+    </div>
+
+    <!-- Fund adding in it -->
+    <!-- Assuming your EJS template is dashboard.ejs -->
+    <!-- <div class="flex justify-center items-center">
+      <div class="fund bg-gray-200 w-full sm:w-1/3 p-4 rounded-md shadow-md">
+        <% if (dashboardData.fund) { %>
+        <h3 class="text-lg font-semibold mb-2">Fund Data</h3>
+        <table class="table-auto">
+          <thead>
+            <tr>
+              <th class="px-4 py-2">Property</th>
+              <th class="px-4 py-2">Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td class="border px-4 py-2">Used Margin</td>
+              <td class="border px-4 py-2">
+                <%= dashboardData.fund.usedMargin %>
+              </td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Payin Amount</td>
+              <td class="border px-4 py-2">
+                <%= dashboardData.fund.payinAmount %>
+              </td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Span Margin</td>
+              <td class="border px-4 py-2">
+                <%= dashboardData.fund.spanMargin %>
+              </td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Adhoc Margin</td>
+              <td class="border px-4 py-2">
+                <%= dashboardData.fund.adhocMargin %>
+              </td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Notional Cash</td>
+              <td class="border px-4 py-2">
+                <%= dashboardData.fund.notionalCash %>
+              </td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Available Margin</td>
+              <td class="border px-4 py-2">
+                <%= dashboardData.fund.availableMargin %>
+              </td>
+            </tr>
+            <tr>
+              <td class="border px-4 py-2">Exposure Margin</td>
+              <td class="border px-4 py-2">
+                <%= dashboardData.fund.exposureMargin %>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <% } else { %>
+        <p class="text-red-500">Error fetching fund data</p>
+        <% } %>
+      </div>
+    </div> -->
+    <!-- socket code  -->
+
+    <!-- Include the Socket.IO client library -->
+    <!-- <script src="/socket.io/socket.io.js"></script> -->
+
+    <script src="/scripts/socket.js"></script>
+
+    <script src="/scripts/profile.js"></script>
   </body>
 </html>
